@@ -1,0 +1,936 @@
+<!DOCTYPE html>
+<html lang="th">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+    <meta name="theme-color" content="#f472b6">
+    <meta name="apple-mobile-web-app-capable" content="yes">
+    <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+    <title>สุ่มของขวัญจ้า</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <style>
+        /* ลูกเล่นอีโมจิลอยขึ้นแบบฟรุ้งฟริ้ง (ปรับให้จางลง ดูแพงขึ้น) */
+        @keyframes floatUp {
+            0% { transform: translateY(105vh) rotate(-15deg) scale(0.8); opacity: 0; }
+            20% { opacity: 0.15; }
+            80% { opacity: 0.15; }
+            100% { transform: translateY(-10vh) rotate(15deg) scale(1.2); opacity: 0; }
+        }
+        .floating-emoji {
+            position: absolute;
+            font-size: 2.5rem;
+            animation: floatUp linear infinite;
+            z-index: 0;
+            pointer-events: none;
+            filter: grayscale(30%) blur(1px);
+            opacity: 0.15;
+        }
+        
+        /* ลูกเล่นแสงออร่าพื้นหลังแบบหรูหรา */
+        @keyframes blob {
+            0% { transform: translate(0px, 0px) scale(1); }
+            33% { transform: translate(30px, -50px) scale(1.1); }
+            66% { transform: translate(-20px, 20px) scale(0.9); }
+            100% { transform: translate(0px, 0px) scale(1); }
+        }
+        .animate-blob {
+            animation: blob 7s infinite;
+        }
+        .animation-delay-2000 {
+            animation-delay: 2s;
+        }
+        
+        /* อนิเมชั่นกล่องสั่นนุ่มนวลขึ้น */
+        @keyframes gentleShake {
+            0% { transform: translateX(0) rotate(0deg); }
+            25% { transform: translateX(-5px) rotate(-5deg); }
+            50% { transform: translateX(5px) rotate(5deg); }
+            75% { transform: translateX(-5px) rotate(-5deg); }
+            100% { transform: translateX(0) rotate(0deg); }
+        }
+        .animate-shake {
+            animation: gentleShake 0.5s ease-in-out infinite;
+        }
+        
+        /* อนิเมชั่น Fade In แบบหรูหรา */
+        @keyframes elegantFadeIn {
+            0% { transform: translateY(20px); opacity: 0; }
+            100% { transform: translateY(0); opacity: 1; }
+        }
+        .animate-pop {
+            animation: elegantFadeIn 0.8s cubic-bezier(0.16, 1, 0.3, 1) forwards;
+        }
+
+        /* อนิเมชั่นเลื่อนรูปภาพซ้ายขวา */
+        @keyframes scroll-marquee {
+            0% { transform: translateX(0); }
+            100% { transform: translateX(-50%); } 
+        }
+        .marquee-track {
+            display: flex;
+            width: max-content;
+            animation: scroll-marquee 40s linear infinite; 
+        }
+        .marquee-track:hover {
+            animation-play-state: paused; 
+        }
+
+        /* --- ปุ่มสไตล์ Minimalist แบรนด์เนม --- */
+        .premium-btn {
+            width: 100%;
+            background-color: #111827;
+            color: #ffffff;
+            font-weight: 500;
+            padding: 1rem 1.5rem;
+            border-radius: 9999px;
+            box-shadow: 0 10px 25px -5px rgba(0, 0, 0, 0.2);
+            transition: all 0.3s cubic-bezier(0.16, 1, 0.3, 1);
+            letter-spacing: 0.05em;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            gap: 0.5rem;
+        }
+        .premium-btn:active {
+            transform: scale(0.97);
+            box-shadow: 0 5px 15px -5px rgba(0, 0, 0, 0.2);
+        }
+        .premium-btn-outline {
+            width: 100%;
+            background-color: transparent;
+            color: #111827;
+            font-weight: 500;
+            padding: 1rem 1.5rem;
+            border-radius: 9999px;
+            border: 1px solid #e5e7eb;
+            transition: all 0.3s ease;
+            letter-spacing: 0.05em;
+        }
+        .premium-btn-outline:active {
+            background-color: #f3f4f6;
+            transform: scale(0.97);
+        }
+
+        /* --- รถบรรทุกส่งของขวัญ --- */
+        .loader {
+          width: fit-content;
+          height: fit-content;
+          display: flex;
+          align-items: center;
+          justify-content: center;
+        }
+
+        .truckWrapper {
+          width: 200px;
+          height: 100px;
+          display: flex;
+          flex-direction: column;
+          position: relative;
+          align-items: center;
+          justify-content: flex-end;
+          overflow-x: hidden;
+        }
+        
+        .truckBody {
+          width: 130px;
+          height: fit-content;
+          margin-bottom: 6px;
+          animation: motion 1s linear infinite;
+        }
+        
+        @keyframes motion {
+          0% { transform: translateY(0px); }
+          50% { transform: translateY(3px); }
+          100% { transform: translateY(0px); }
+        }
+        
+        .truckTires {
+          width: 130px;
+          height: fit-content;
+          display: flex;
+          align-items: center;
+          justify-content: space-between;
+          padding: 0px 10px 0px 15px;
+          position: absolute;
+          bottom: 0;
+        }
+        
+        .truckTires svg {
+          width: 24px;
+        }
+
+        .road {
+          width: 100%;
+          height: 1.5px;
+          background-color: #282828;
+          position: relative;
+          bottom: 0;
+          align-self: flex-end;
+          border-radius: 3px;
+        }
+        
+        .road::before {
+          content: "";
+          position: absolute;
+          width: 20px;
+          height: 100%;
+          background-color: #282828;
+          right: -50%;
+          border-radius: 3px;
+          animation: roadAnimation 1.4s linear infinite;
+          border-left: 10px solid white;
+        }
+        
+        .road::after {
+          content: "";
+          position: absolute;
+          width: 10px;
+          height: 100%;
+          background-color: #282828;
+          right: -65%;
+          border-radius: 3px;
+          animation: roadAnimation 1.4s linear infinite;
+          border-left: 4px solid white;
+        }
+
+        .lampPost {
+          position: absolute;
+          bottom: 0;
+          right: -90%;
+          height: 90px;
+          animation: roadAnimation 1.4s linear infinite;
+        }
+
+        @keyframes roadAnimation {
+          0% { transform: translateX(0px); }
+          100% { transform: translateX(-350px); }
+        }
+    </style>
+    <script>
+        // รายการของขวัญทั้ง 35 ชิ้น
+        const gifts = [
+            { name: "ของขวัญชิ้นที่ 1 🎁", image_url: "https://img1.pic.in.th/images/Messenger_creation_684C638B-84D5-4279-A18B-83A3F1596BEE.jpeg" },
+            { name: "ของขวัญชิ้นที่ 2 🎁", image_url: "https://img2.pic.in.th/Messenger_creation_72C7E685-04ED-461E-BDFA-1A96BC66E50F.jpeg" },
+            { name: "ของขวัญชิ้นที่ 3 🎁", image_url: "https://img1.pic.in.th/images/Messenger_creation_F63063DE-E6EA-4A3C-8EF7-42B342139A85.jpeg" },
+            { name: "ของขวัญชิ้นที่ 4 🎁", image_url: "https://img2.pic.in.th/Messenger_creation_1E4E9527-799C-49DF-A56F-7470E5724048065e9a877f828377.jpeg" },
+            { name: "ของขวัญชิ้นที่ 5 🎁", image_url: "https://img2.pic.in.th/Messenger_creation_55559A69-B1E2-47E2-BA83-60A1417A90B7.jpeg" },
+            { name: "ของขวัญชิ้นที่ 6 🎁", image_url: "https://img1.pic.in.th/images/Messenger_creation_EB160CA7-439B-4ADB-A5DF-317290BB6B0F.jpeg" },
+            { name: "ของขวัญชิ้นที่ 7 🎁", image_url: "https://img1.pic.in.th/images/Messenger_creation_596C25F8-AA6C-4AD5-AFD1-2DE5A9651BA3.jpeg" },
+            { name: "ของขวัญชิ้นที่ 8 🎁", image_url: "https://img2.pic.in.th/Messenger_creation_A1ADFCF5-51C2-4621-855A-C228C953E0ABe74e25bfff569576.jpeg" },
+            { name: "ของขวัญชิ้นที่ 9 🎁", image_url: "https://img2.pic.in.th/Messenger_creation_FC557FE9-E58B-4D9B-BFA9-5C5503F34DF8.jpeg" },
+            { name: "ของขวัญชิ้นที่ 10 🎁", image_url: "https://img2.pic.in.th/Messenger_creation_74CF6124-F8FB-4F8B-A885-5B0D686C7C1F4c106092aa986985.jpeg" },
+            { name: "ของขวัญชิ้นที่ 11 🎁", image_url: "https://img1.pic.in.th/images/Messenger_creation_ACD56E4C-B8D2-41D1-813F-472889C6AF73.jpeg" },
+            { name: "ของขวัญชิ้นที่ 12 🎁", image_url: "https://img1.pic.in.th/images/Messenger_creation_A988715C-AE35-4E14-99C0-A4964E18C02B.jpeg" },
+            { name: "ของขวัญชิ้นที่ 13 🎁", image_url: "https://img2.pic.in.th/Messenger_creation_80E22DA6-CAC4-4509-AD47-70745922E476.jpeg" },
+            { name: "ของขวัญชิ้นที่ 14 🎁", image_url: "https://img1.pic.in.th/images/Messenger_creation_5856ADCC-CD48-4785-9EA2-5AA276F5A05B.jpeg" },
+            { name: "ของขวัญชิ้นที่ 15 🎁", image_url: "https://img1.pic.in.th/images/Messenger_creation_923B7A0C-1909-42D0-A00E-765C32828E61.jpeg" },
+            { name: "ของขวัญชิ้นที่ 16 🎁", image_url: "https://img2.pic.in.th/Messenger_creation_65E9DE59-AE99-4AB4-971B-0EE7313706BC312b4a44446dabe5.jpeg" },
+            { name: "ของขวัญชิ้นที่ 17 🎁", image_url: "https://img1.pic.in.th/images/Messenger_creation_369DA539-472F-48F5-AA54-334710F1D46A.jpeg" },
+            { name: "ของขวัญชิ้นที่ 18 🎁", image_url: "https://img2.pic.in.th/Messenger_creation_BDFD5313-4D36-427F-BC5F-CA5F3DF268D0979ecaec9b45e4c5.jpeg" },
+            { name: "ของขวัญชิ้นที่ 19 🎁", image_url: "https://img1.pic.in.th/images/Messenger_creation_728CC8B7-CFF6-4979-9FB7-1772F1493AD0.jpeg" },
+            { name: "ของขวัญชิ้นที่ 20 🎁", image_url: "https://img2.pic.in.th/Messenger_creation_72997B57-A8A7-4CE0-81B9-1FC61E83D6B4187acd25af5615d2.jpeg" },
+            { name: "ของขวัญชิ้นที่ 21 🎁", image_url: "https://img1.pic.in.th/images/Messenger_creation_12F1ED45-79AA-4B21-95F9-12D2140D7F12.jpeg" },
+            { name: "ของขวัญชิ้นที่ 22 🎁", image_url: "https://img2.pic.in.th/Messenger_creation_C12CF3B2-64A6-4C10-AD17-89A6EA043394cbc278990448c892.jpeg" },
+            { name: "ของขวัญชิ้นที่ 23 🎁", image_url: "https://img1.pic.in.th/images/Messenger_creation_C30998C2-0F88-4A1A-8650-36F92E4E8206.jpeg" },
+            { name: "ของขวัญชิ้นที่ 24 🎁", image_url: "https://img2.pic.in.th/Messenger_creation_B1A410FF-65A0-4687-BCD7-2CEEEE1F852B8eec7e78a83ce845.jpeg" },
+            { name: "ของขวัญชิ้นที่ 25 🎁", image_url: "https://img1.pic.in.th/images/Messenger_creation_EAE9AE96-75E0-4290-A1BE-3B825EFE46DB.jpeg" },
+            { name: "ของขวัญชิ้นที่ 26 🎁", image_url: "https://img2.pic.in.th/Messenger_creation_A83AFF2E-578E-474F-B058-BF6E10FCDEA41dcc8652ff663158.jpeg" },
+            { name: "ของขวัญชิ้นที่ 27 🎁", image_url: "https://img1.pic.in.th/images/Messenger_creation_A1884A48-6BD9-4FE3-887D-2D0D7D5A9F68.jpeg" },
+            { name: "ของขวัญชิ้นที่ 28 🎁", image_url: "https://img2.pic.in.th/Messenger_creation_023145FA-662E-46FD-9B10-54D2BE9264BFa42e7b84955b5b72.jpeg" },
+            { name: "ของขวัญชิ้นที่ 29 🎁", image_url: "https://img1.pic.in.th/images/Messenger_creation_58552287-9354-4E89-ADBB-95BA2197B119.jpeg" },
+            { name: "ของขวัญชิ้นที่ 30 🎁", image_url: "https://img2.pic.in.th/Messenger_creation_ABAAA7CB-8A71-45BD-A835-3E213A7B7574f1edd42657d2b0ca.jpeg" },
+            { name: "ของขวัญชิ้นที่ 31 🎁", image_url: "https://img1.pic.in.th/images/Messenger_creation_5B3510C5-0DAE-4C66-95CC-10290C2FE059.jpeg" },
+            { name: "ของขวัญชิ้นที่ 32 🎁", image_url: "https://img2.pic.in.th/Messenger_creation_5DA877E8-030F-43DA-A968-905E79852702f9ffea532392cb0e.jpeg" },
+            { name: "ของขวัญชิ้นที่ 33 🎁", image_url: "https://img1.pic.in.th/images/Messenger_creation_CD58EE2B-E96A-498D-9434-3127F9BE5EF7.jpeg" },
+            { name: "ของขวัญชิ้นที่ 34 🎁", image_url: "https://img2.pic.in.th/Messenger_creation_8E9452E0-90F5-43C0-A412-80B66F5C4752c642f4b7a423fe26.jpeg" },
+            { name: "ของขวัญชิ้นที่ 35 🎁", image_url: "https://img2.pic.in.th/Messenger_creation_DA6B2CC7-12C9-4240-8D6E-94BBD98B66AB.jpeg" }
+        ];
+
+        // รายการความทรงจำ (อัปเดตรูปคู่ 9 รูป)
+        const memories = [
+            { image_url: "https://img2.pic.in.th/B612_20220716_213307_364_mh1657982487020.jpg", text: "รูปนี้จำได้ป่าว นานแล้วเหมือนกันนะเนี่ย 📸" },
+            { image_url: "https://img2.pic.in.th/B612_20220716_215316_062_mh1657983460321.jpg", text: "ไปเที่ยวกัน สนุกดีเหมือนกันนะวันนั้น 🚗" },
+            { image_url: "https://img1.pic.in.th/images/B612_20211216_031522_533.jpg", text: "ถ่ายเล่นๆ แต่ออกมาน่ารักดี 🤍" },
+            { image_url: "https://img1.pic.in.th/images/B612_20211216_031724_234.jpg", text: "เวลาผ่านไปไวจริงๆ แป๊บเดียวเอง ✨" },
+            { image_url: "https://img2.pic.in.th/B612_20211216_032632_412.jpg", text: "อยู่ด้วยกันแล้วสบายใจดีนะ" },
+            { image_url: "https://img1.pic.in.th/images/B612_20211201_234109_394_edit_115774004404166.jpg", text: "รูปนี้หน้าแอบฮา แต่ก็ชอบนะ 😂" },
+            { image_url: "https://img2.pic.in.th/MTXX_MH20240412_013327335.jpg", text: "ผ่านอะไรมาตั้งเยอะ ทนเก่งเหมือนกันนะเนี่ยเราสองคน" },
+            { image_url: "https://img1.pic.in.th/images/MTXX_MR20240411_210507615.jpg", text: "ขอบคุณที่คอยอยู่ข้างๆ กันมาตลอดนะ 😊" },
+            { image_url: "https://img2.pic.in.th/MTXX_MH20240411_213523619.jpg", text: "ผ่านไปอีกปีแล้ว โตขึ้นอีกนิดนึงแล้วดิ 🎉" }
+        ];
+        let currentMemoryIndex = 0;
+        
+        // ข้อความในหน้าแชท (เรียงทีละบรรทัด)
+        const chatMessages = [
+            "แฮปปี้เบิร์ธเดย์นะ 🎉 โตขึ้นอีกปีแล้ว",
+            "เอาจริงๆ เป็นคนพูดไม่ค่อยเก่ง แสดงออกก็ไม่ค่อยเป็น เลยตั้งใจทำเว็บนี้มาให้แทน 😅",
+            "เวลาที่หายเงียบไปเป็นวันๆ... ไม่ได้รำคาญหรือไม่อยากคุยด้วยนะ แค่บางทีแบตสังคมมันหมดเกลี้ยง เลยขอไปชาร์จพลังแป๊บนึง",
+            "จริงๆ ก็คิดถึงตลอดนั่นแหละ แต่บางทีไม่รู้จะเริ่มทักยังไง กลัวทักไปแล้วไม่รู้จะคุยอะไรต่อ",
+            "ถึงจะดูนิ่งๆ หายๆ ไปบ้าง แต่ก็ให้ความสำคัญเสมอนะ หายไปไหนเดี๋ยวก็กลับมาป่วนเหมือนเดิม 🤍",
+            "อาจจะพูดหวานๆ ไม่เก่งเหมือนคนอื่น แต่ก็ตั้งใจทำให้จริงๆ นะ มีความสุขมากๆ ล่ะ ✨"
+        ];
+        let currentChatIndex = 0;
+        let chatMode = "sequence"; 
+        
+        let currentGift = null;
+        let globalUserName = "คนเก่ง"; 
+
+        function initApp() {
+            createBalloons();
+            populateGifts();
+        }
+
+        function createBalloons() {
+            const container = document.getElementById("balloonContainer");
+            if (!container) return;
+            container.innerHTML = ''; 
+            const emojis = ['🎈', '🎉', '🎂', '✨', '🎁', '💖'];
+            for (let i = 0; i < 20; i++) {
+                let el = document.createElement("div");
+                el.innerText = emojis[Math.floor(Math.random() * emojis.length)];
+                el.className = "floating-emoji";
+                el.style.left = (Math.random() * 100) + "vw";
+                el.style.animationDuration = (Math.random() * 4 + 4) + "s";
+                el.style.animationDelay = (Math.random() * 3) + "s";
+                container.appendChild(el);
+            }
+        }
+
+        function populateGifts() {
+            const marqueeReveal = document.getElementById("giftMarqueeReveal");
+            const marqueeRandom = document.getElementById("giftMarqueeRandom");
+            const grid = document.getElementById("chooseGiftGrid");
+            let marqueeHTML = "";
+            let gridHTML = "";
+
+            gifts.forEach((gift, index) => {
+                marqueeHTML += `<div class="h-16 w-16 sm:h-20 sm:w-20 bg-white rounded-lg shadow-sm border border-pink-200 mx-1 flex-shrink-0 p-1 flex items-center justify-center overflow-hidden"><img src="${gift.image_url}" loading="lazy" decoding="async" class="h-full w-full object-contain" alt="${gift.name}"></div>`;
+                
+                gridHTML += `
+                    <div onclick="selectManualGift(${index})" class="bg-pink-50 rounded-xl p-2 border border-pink-200 shadow-sm flex flex-col items-center justify-between cursor-pointer active:scale-95 transition-transform hover:shadow-md h-32 sm:h-40">
+                        <div class="w-full flex-1 flex items-center justify-center bg-white rounded-lg mb-2 overflow-hidden p-1">
+                            <img src="${gift.image_url}" loading="lazy" decoding="async" class="max-h-full max-w-full object-contain" alt="${gift.name}">
+                        </div>
+                        <span class="text-pink-600 font-bold text-[10px] sm:text-xs text-center line-clamp-1 w-full truncate">${gift.name}</span>
+                    </div>
+                `;
+            });
+
+            if (marqueeReveal) marqueeReveal.innerHTML = marqueeHTML + marqueeHTML;
+            if (marqueeRandom) marqueeRandom.innerHTML = marqueeHTML + marqueeHTML;
+            if (grid) grid.innerHTML = gridHTML;
+        }
+
+        // --- ฟังก์ชันซ่อนทุกหน้าต่าง ---
+        function hideAllScreens() {
+            const screens = ["startScreen", "memoryScreen", "chatScreen", "revealScreen", "cakeHintScreen", "randomBoxArea", "giftArea", "customInputArea", "chooseGiftScreen", "deliveryScreen", "hintScreen", "thankYouScreen"];
+            screens.forEach(id => {
+                const el = document.getElementById(id);
+                if(el) el.classList.add("hidden");
+            });
+        }
+
+        // --- ฟังก์ชันบันทึกข้อมูล ---
+        function logToSheet(action, detail) {
+            console.log(`กำลังบันทึก: ${action} -> ${detail}`);
+            if (typeof google !== 'undefined' && google.script && google.script.run) {
+                google.script.run.logData(action, detail);
+            }
+        }
+
+        // --- ลำดับที่ 1: ทักทาย ---
+        function startGame() {
+            // เล่นเพลงพื้นหลังตอนที่เขากดเริ่ม
+            const bgMusic = document.getElementById("bgMusic");
+            if (bgMusic) {
+                bgMusic.volume = 0.4;
+                bgMusic.play().catch(e => console.log("เบราว์เซอร์บล็อกการเล่นเพลง:", e));
+            }
+
+            const loginNameInput = document.getElementById("loginName");
+            const loginName = loginNameInput ? loginNameInput.value.trim() : "";
+            globalUserName = loginName || "คนเก่ง"; 
+            
+            const detailText = loginName !== "" ? `เข้าสู่ระบบโดย: ${loginName}` : "กดปุ่มเข้าสู่ระบบ (ไม่ใส่ชื่อ)";
+            logToSheet("เข้าสู่ระบบ", detailText);
+            
+            hideAllScreens();
+            currentMemoryIndex = 0;
+            updateMemoryUI();
+            document.getElementById("memoryScreen").classList.remove("hidden");
+        }
+
+        // --- ลำดับที่ 2: รื้อฟื้นความทรงจำ ---
+        function updateMemoryUI() {
+            const mem = memories[currentMemoryIndex];
+            const imgContainer = document.getElementById("memoryImageContainer");
+            
+            if (mem.image_url) {
+                const loadType = currentMemoryIndex === 0 ? "eager" : "lazy";
+                imgContainer.innerHTML = `<img src="${mem.image_url}" loading="${loadType}" decoding="async" class="w-full h-48 sm:h-56 object-contain bg-white rounded-xl shadow-inner border-2 border-pink-100 p-2">`;
+            } else {
+                imgContainer.innerHTML = `<div class="w-full h-48 sm:h-56 bg-pink-100 rounded-xl flex items-center justify-center shadow-inner border-2 border-dashed border-pink-300">
+                    <span class="text-gray-500 text-sm font-medium text-center px-4">📸<br><small>ใส่ลิงก์รูปความทรงจำตรงนี้นะอิน</small></span>
+                </div>`;
+            }
+            
+            document.getElementById("memoryText").innerHTML = mem.text;
+            
+            // จัดการปุ่ม "ไปต่อ"
+            const nextBtn = document.getElementById("nextMemoryBtn");
+            if (currentMemoryIndex === memories.length - 1) {
+                nextBtn.innerHTML = `ต่อไปมีอะไรจะบอก... 💌`;
+                nextBtn.onclick = () => showChatScreen('sequence');
+            } else {
+                nextBtn.innerHTML = `ดูรูปถัดไป ⏭️`;
+                nextBtn.onclick = nextMemory;
+            }
+
+            // จัดการปุ่ม "ก่อนหน้า" 
+            const prevBtn = document.getElementById("prevMemoryBtn");
+            if (currentMemoryIndex === 0) {
+                prevBtn.classList.add("opacity-0", "pointer-events-none");
+            } else {
+                prevBtn.classList.remove("opacity-0", "pointer-events-none");
+            }
+            
+            document.getElementById("memoryCounter").innerText = `${currentMemoryIndex + 1} / ${memories.length}`;
+        }
+
+        function nextMemory() {
+            currentMemoryIndex++;
+            updateMemoryUI();
+        }
+
+        function prevMemory() {
+            if (currentMemoryIndex > 0) {
+                currentMemoryIndex--;
+                updateMemoryUI();
+            }
+        }
+
+        // --- ลำดับที่ 3: แชทความในใจ ---
+        function showChatScreen(mode = "sequence") {
+            chatMode = mode;
+            logToSheet("เข้าดูหน้าพิเศษ", "อ่านแชทความในใจ");
+            hideAllScreens();
+            
+            const chatContainer = document.getElementById("chatMessageContainer");
+            chatContainer.innerHTML = ""; 
+            currentChatIndex = 0;
+            
+            document.getElementById("typingIndicator").classList.remove("hidden");
+            document.getElementById("chatNextBtn").classList.add("hidden");
+            document.getElementById("chatScreen").classList.remove("hidden");
+            
+            setTimeout(renderNextChatMessage, 800);
+        }
+
+        function renderNextChatMessage() {
+            if (currentChatIndex >= chatMessages.length) {
+                document.getElementById("typingIndicator").classList.add("hidden");
+                const nextBtn = document.getElementById("chatNextBtn");
+                nextBtn.classList.remove("hidden");
+                nextBtn.innerText = chatMode === "sequence" ? "อ่านจบแล้ว ไปต่อกัน!" : "ปิดแชทกลับไปหน้าจัดส่ง";
+                return;
+            }
+
+            document.getElementById("typingIndicator").classList.remove("hidden");
+
+            const msg = chatMessages[currentChatIndex];
+            const typingDelay = Math.max(1200, msg.length * 40); 
+
+            setTimeout(() => {
+                const chatContainer = document.getElementById("chatMessageContainer");
+                const msgDiv = document.createElement("div");
+                msgDiv.className = "flex gap-2 w-full max-w-[85%] animate-pop";
+                msgDiv.innerHTML = `
+                    <div class="bg-gray-50 p-3.5 rounded-2xl rounded-tl-none shadow-sm text-sm text-gray-700 font-light leading-relaxed border border-gray-100/50">
+                        ${msg}
+                    </div>
+                `;
+                chatContainer.appendChild(msgDiv);
+                chatContainer.scrollTop = chatContainer.scrollHeight;
+                currentChatIndex++;
+                
+                setTimeout(renderNextChatMessage, 500); 
+            }, typingDelay);
+        }
+
+        function closeChatScreen() {
+            if (chatMode === "sequence") {
+                showRevealScreen();
+            } else {
+                hideAllScreens();
+                document.getElementById("deliveryScreen").classList.remove("hidden");
+            }
+        }
+
+        // --- ลำดับที่ 4: อวยพรวันเกิด (Reveal) ---
+        function showRevealScreen() {
+            logToSheet("ความคืบหน้า", "เข้าสู่หน้าอวยพรวันเกิด");
+            hideAllScreens();
+            document.getElementById("revealName").innerText = globalUserName;
+            document.getElementById("revealScreen").classList.remove("hidden");
+        }
+
+        // --- ลำดับที่ 5: ใบ้หาเค้ก ---
+        function showCakeHintScreen() {
+            logToSheet("ความคืบหน้า", "เข้าสู่หน้าใบ้หาเค้ก");
+            hideAllScreens();
+            document.getElementById("cakeHintScreen").classList.remove("hidden");
+        }
+
+        // --- ลำดับที่ 6: สุ่มของขวัญ (กล่องสั่น) ---
+        function startRandomizing() {
+            logToSheet("ความคืบหน้า", "เริ่มสุ่มของขวัญ");
+            hideAllScreens();
+            document.getElementById("balloonContainer").classList.add("hidden");
+            
+            const randomBox = document.getElementById("randomBoxArea");
+            randomBox.classList.remove("hidden");
+            
+            setTimeout(() => {
+                randomBox.classList.add("hidden");
+                showGift();
+            }, 2000);
+        }
+
+        // --- ลำดับที่ 7: โชว์ของขวัญ ---
+        function showGift() {
+            const randomIndex = Math.floor(Math.random() * gifts.length);
+            currentGift = gifts[randomIndex];
+            
+            logToSheet("ระบบสุ่มให้", currentGift.name);
+
+            const giftImageContainer = document.getElementById("giftImageContainer");
+            const giftNameDisplay = document.getElementById("giftNameDisplay");
+            
+            if (currentGift.image_url) {
+                giftImageContainer.innerHTML = `<img src="${currentGift.image_url}" loading="eager" decoding="async" alt="${currentGift.name}" class="w-full h-36 sm:h-48 object-contain bg-white rounded-xl shadow-inner mb-3 p-2">`;
+            } else {
+                giftImageContainer.innerHTML = `<div class="w-full h-36 sm:h-48 bg-pink-100 rounded-xl flex items-center justify-center shadow-inner mb-3 border-2 border-dashed border-pink-300">
+                    <span class="text-gray-500 text-sm font-medium"><br><small>เดี๋ยวอินมาใส่รูปทีหลัง</small></span>
+                </div>`;
+            }
+            
+            giftNameDisplay.innerHTML = currentGift.name;
+            document.getElementById("giftArea").classList.remove("hidden");
+        }
+
+        function acceptGift() {
+            logToSheet("การตัดสินใจ", `กดรับ: ${currentGift.name}`);
+            showDeliveryScreen(currentGift.name, currentGift.image_url);
+        }
+
+        function rejectGift() {
+            logToSheet("การตัดสินใจ", `กดไม่เอา: ${currentGift.name} (ขอสุ่มใหม่)`);
+            startRandomizing();
+        }
+        
+        function showCustomInput() {
+            logToSheet("การตัดสินใจ", `ไม่เอา ${currentGift.name} ขอพิมพ์เอง`);
+            hideAllScreens();
+            document.getElementById("customInputArea").classList.remove("hidden");
+        }
+        
+        function submitCustomGift() {
+            const customItem = document.getElementById("customGiftInput").value.trim();
+            if (customItem === "") {
+                document.getElementById("customErrorMessage").classList.remove("hidden");
+                return;
+            }
+            document.getElementById("customErrorMessage").classList.add("hidden");
+            logToSheet("ขอของขวัญเอง", customItem);
+            showDeliveryScreen(customItem, null);
+        }
+
+        function showChooseScreen() {
+            logToSheet("การตัดสินใจ", "ขี้เกียจสุ่ม ขอจิ้มเลือกเอง");
+            hideAllScreens();
+            document.getElementById("chooseGiftScreen").classList.remove("hidden");
+        }
+
+        function selectManualGift(index) {
+            const selectedGift = gifts[index];
+            logToSheet("การตัดสินใจ", `จิ้มเลือกเองเลย: ${selectedGift.name}`);
+            showDeliveryScreen(selectedGift.name, selectedGift.image_url);
+        }
+
+        // --- ลำดับที่ 8: จัดส่งสินค้า (จบ) ---
+        function showDeliveryScreen(giftName, imageUrl) {
+            hideAllScreens();
+            
+            document.getElementById("deliveryNameSpan").innerText = globalUserName;
+            document.getElementById("deliveryGiftName").innerText = giftName;
+            
+            const deliveryImgContainer = document.getElementById("deliveryImageContainer");
+            if (imageUrl) {
+                deliveryImgContainer.innerHTML = `<img src="${imageUrl}" class="w-full h-32 sm:h-40 object-contain bg-white rounded-xl shadow-md border-2 border-pink-100 p-2">`;
+            } else {
+                deliveryImgContainer.innerHTML = `<div class="w-full h-32 sm:h-40 bg-pink-100 rounded-xl flex flex-col items-center justify-center shadow-inner border-2 border-dashed border-pink-300">
+                    <span class="text-3xl mb-1">🎁</span><span class="text-gray-500 text-xs font-medium">ของขวัญชิ้นพิเศษ!</span>
+                </div>`;
+            }
+            
+            document.getElementById("deliveryScreen").classList.remove("hidden");
+        }
+
+        // --- ฟังก์ชันช่วยเหลือและการนำทาง ---
+        function showHints() {
+            logToSheet("เข้าดูหน้าพิเศษ", "ดูคำใบ้หาเค้ก/ของขวัญ");
+            hideAllScreens();
+            document.getElementById("hintScreen").classList.remove("hidden");
+        }
+
+        function backToDeliveryFromHint() {
+            hideAllScreens();
+            document.getElementById("deliveryScreen").classList.remove("hidden");
+        }
+
+        function goBackToMain() {
+            logToSheet("การนำทาง", "กลับหน้าหลัก (หน้าอวยพร)");
+            hideAllScreens();
+            document.getElementById("revealScreen").classList.remove("hidden");
+        }
+
+        function showThankYouScreen() {
+            logToSheet("การจบเกม", "กดปุ่มปิด - เข้าสู่หน้าขอบคุณ");
+            hideAllScreens();
+            document.getElementById("thankYouScreen").classList.remove("hidden");
+        }
+
+        function resetGame() {
+            hideAllScreens();
+            
+            // หยุดเพลงเมื่อกลับไปหน้าแรก
+            const bgMusic = document.getElementById("bgMusic");
+            if (bgMusic) {
+                bgMusic.pause();
+                bgMusic.currentTime = 0;
+            }
+
+            document.getElementById("startScreen").classList.remove("hidden");
+            document.getElementById("balloonContainer").classList.remove("hidden");
+            document.getElementById("loginName").value = "";
+        }
+
+        window.onload = initApp;
+    </script>
+</head>
+<body class="bg-[#fafafa] h-[100dvh] flex flex-col font-sans overflow-hidden select-none touch-manipulation relative text-gray-800">
+
+    <audio id="bgMusic" loop>
+        <source src="https://files.catbox.moe/szl44b.mp3" type="audio/mpeg">
+    </audio>
+
+    <div class="absolute top-0 -left-4 w-72 h-72 bg-rose-200 rounded-full mix-blend-multiply filter blur-[80px] opacity-40 animate-blob pointer-events-none z-0"></div>
+    <div class="absolute top-0 -right-4 w-72 h-72 bg-pink-200 rounded-full mix-blend-multiply filter blur-[80px] opacity-40 animate-blob animation-delay-2000 pointer-events-none z-0"></div>
+    <div class="absolute -bottom-8 left-20 w-72 h-72 bg-rose-100 rounded-full mix-blend-multiply filter blur-[80px] opacity-40 animate-blob pointer-events-none z-0"></div>
+
+    <div id="balloonContainer" class="absolute inset-0 overflow-hidden pointer-events-none z-0"></div>
+
+    <header class="pt-10 pb-2 px-4 z-10 shrink-0 bg-transparent">
+        <div class="text-center">
+            <h1 class="text-sm font-semibold tracking-widest text-gray-400 uppercase">Special Gift</h1>
+        </div>
+    </header>
+
+    <main class="flex-1 flex flex-col items-center justify-center p-4 sm:p-6 w-full max-w-md mx-auto relative overflow-hidden z-10">
+        
+        <div id="startScreen" class="w-full flex flex-col items-center justify-center space-y-6 transition-all duration-500 bg-white/60 backdrop-blur-2xl p-8 rounded-[2.5rem] shadow-[0_8px_30px_rgb(0,0,0,0.04)] border border-white/80 relative overflow-hidden z-10 animate-pop">
+            <div class="w-16 h-16 bg-gradient-to-br from-rose-100 to-rose-50 rounded-full flex items-center justify-center shadow-sm mb-2">
+                <span class="text-3xl text-rose-400">✨</span>
+            </div>
+            <div class="z-10 text-center w-full">
+                <h2 class="text-2xl font-semibold text-gray-800 mb-2 tracking-wide">
+                    วันนี้วันอะไรเอ่ย?
+                </h2>
+                <p class="text-gray-400 font-light mb-6 text-sm">กรุณากรอกชื่อเพื่อเริ่มต้น</p>
+                <div class="w-full">
+                    <input type="text" id="loginName" placeholder="Your Name" 
+                           class="w-full px-6 py-4 rounded-full border border-gray-100 bg-white/50 focus:bg-white focus:border-rose-200 focus:ring-4 focus:ring-rose-50 focus:outline-none text-center text-gray-700 text-lg transition-all font-light shadow-[inset_0_2px_4px_rgba(0,0,0,0.02)]">
+                </div>
+                <div class="w-full mt-8">
+                    <button class="premium-btn" onclick="startGame()">
+                        เข้าสู่ระบบ
+                        <svg xmlns="http://www.w3.org/2000/svg" class="h-4 w-4 ml-1" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M14 5l7 7m0 0l-7 7m7-7H3" /></svg>
+                    </button>
+                </div>
+            </div>
+        </div>
+
+        <div id="memoryScreen" class="hidden w-full flex flex-col items-center justify-center transition-all duration-500 bg-white/60 backdrop-blur-2xl pt-8 pb-6 px-6 rounded-[2.5rem] shadow-[0_8px_30px_rgb(0,0,0,0.04)] border border-white/80 relative overflow-hidden z-10 animate-pop">
+            <h2 class="text-lg font-light text-gray-500 mb-6 tracking-wide text-center">
+                Memories <span class="text-rose-400 font-serif italic ml-1">with you</span>
+            </h2>
+            <div id="memoryImageContainer" class="w-full"></div>
+            <div class="w-full mt-6 mb-4 flex items-center justify-center">
+                <p id="memoryText" class="text-gray-600 font-light text-base text-center leading-relaxed"></p>
+            </div>
+            <div class="flex items-center justify-between w-full mt-4">
+                <button id="prevMemoryBtn" onclick="prevMemory()" class="text-gray-400 font-medium text-sm flex items-center gap-1 hover:text-gray-600 transition-colors opacity-0 pointer-events-none">
+                    <svg xmlns="http://www.w3.org/2000/svg" class="h-4 w-4" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 19l-7-7 7-7" /></svg> Back
+                </button>
+                <div id="memoryCounter" class="text-gray-400 text-xs font-medium tracking-widest text-center flex-1">1 / 9</div>
+                <button id="nextMemoryBtn" class="text-rose-500 font-medium text-sm flex items-center gap-1 hover:text-rose-600 transition-colors">
+                    Next <svg xmlns="http://www.w3.org/2000/svg" class="h-4 w-4" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5l7 7-7 7" /></svg>
+                </button>
+            </div>
+        </div>
+
+        <div id="chatScreen" class="hidden w-full flex flex-col transition-all duration-500 bg-white/80 backdrop-blur-3xl p-5 rounded-[2.5rem] shadow-[0_8px_30px_rgb(0,0,0,0.04)] border border-white/80 relative z-10 animate-pop h-[80vh]">
+            <div class="flex items-center justify-between border-b border-gray-100 pb-4 mb-4 shrink-0 px-2">
+                <div class="flex items-center gap-3">
+                    <div class="w-10 h-10 bg-gradient-to-tr from-rose-100 to-white rounded-full flex items-center justify-center text-lg shadow-sm border border-gray-100">💬</div>
+                    <div>
+                        <h3 class="font-medium text-gray-800 text-sm">New Message</h3>
+                        <p id="typingIndicator" class="text-[10px] text-rose-400 font-light tracking-wide animate-pulse">typing...</p>
+                    </div>
+                </div>
+            </div>
+            
+            <div id="chatMessageContainer" class="flex-1 overflow-y-auto flex flex-col gap-4 pr-2 pb-4 scrollbar-hide">
+                </div>
+            
+            <div class="pt-4 border-t border-gray-100 shrink-0">
+                <button id="chatNextBtn" onclick="closeChatScreen()" class="premium-btn hidden">
+                    อ่านจบแล้ว ไปต่อกัน!
+                </button>
+            </div>
+        </div>
+
+        <div id="revealScreen" class="hidden w-full flex flex-col items-center justify-center transition-all duration-500 bg-white/60 backdrop-blur-2xl py-10 px-6 rounded-[2.5rem] shadow-[0_8px_30px_rgb(0,0,0,0.04)] border border-white/80 relative overflow-hidden z-10 animate-pop">
+            <div class="z-10 text-center w-full">
+                <p class="text-sm font-light text-gray-400 tracking-widest uppercase mb-2">Happy Birthday</p>
+                <h2 class="text-3xl font-medium text-gray-800 mb-6 tracking-wide">
+                    <span id="revealName" class="text-rose-500">คนเก่ง</span>
+                </h2>
+                
+                <div class="flex flex-col items-center justify-center gap-1 my-6">
+                    <span class="text-7xl font-light text-gray-800 tracking-tighter">31</span>
+                    <span class="text-sm font-medium text-rose-400 tracking-[0.2em] uppercase">March</span>
+                </div>
+                
+                <div class="w-full mt-8">
+                    <p class="text-gray-500 font-light text-sm leading-relaxed px-4">
+                        ขอให้ปีนี้ปังปุริเย่ มีแต่คนใจดีด้วย รวยๆ เฮงๆ นะจ๊ะ แต่อย่าเพิ่งสุ่มของนะ... ไปหาเค้กกันก่อน!
+                    </p>
+                </div>
+
+                <div class="w-full mt-8 bg-white/40 py-3 rounded-2xl border border-white">
+                    <p class="text-[10px] text-gray-400 font-medium mb-2 uppercase tracking-widest">Sneak Peek</p>
+                    <div class="w-full overflow-hidden flex">
+                        <div id="giftMarqueeReveal" class="marquee-track"></div>
+                    </div>
+                </div>
+
+                <div class="w-full mt-8">
+                    <button class="premium-btn" onclick="showCakeHintScreen()">
+                        เริ่มภารกิจหาเค้ก
+                    </button>
+                </div>
+            </div>
+        </div>
+
+        <div id="cakeHintScreen" class="hidden w-full flex flex-col items-center transition-all duration-500 bg-white/60 backdrop-blur-2xl p-8 rounded-[2.5rem] shadow-[0_8px_30px_rgb(0,0,0,0.04)] border border-white/80 relative z-10 animate-pop">
+            <div class="w-12 h-12 bg-gray-50 rounded-full flex items-center justify-center shadow-sm mb-4 border border-gray-100">
+                <span class="text-xl">📍</span>
+            </div>
+            <h2 class="text-xl font-medium text-gray-800 mb-6 tracking-wide text-center">Special Mission</h2>
+            
+            <div class="w-full">
+                <div class="bg-white p-6 rounded-2xl border border-gray-100 shadow-[0_4px_20px_rgb(0,0,0,0.03)] border-l-4 border-l-rose-300">
+                    <h3 class="font-medium text-gray-800 text-sm mb-3 uppercase tracking-widest">Hint: Cake 🎂</h3>
+                    <p class="text-gray-500 text-sm font-light leading-relaxed">
+                        ลองเดินไปที่ตู้เย็น แล้วเปิดดูชั้นล่างสุดสิ อาจจะมีก้อนกลมๆ หวานๆ รอให้คนเก่งเป่าเทียนอยู่น้าาา~ <br><br>
+                        <span class="text-rose-500 font-medium">รีบไปหยิบมาเป่าเร๊ววว!</span>
+                    </p>
+                </div>
+            </div>
+            
+            <div class="w-full mt-8">
+                <button onclick="startRandomizing()" class="premium-btn">
+                    หาเจอแล้ว! ไปสุ่มของกัน
+                </button>
+            </div>
+        </div>
+
+        <div id="randomBoxArea" class="hidden w-full flex flex-col items-center justify-center space-y-8 h-[60vh]">
+            <div class="w-24 h-24 bg-white rounded-3xl shadow-xl flex items-center justify-center animate-shake border border-gray-50">
+                <span class="text-5xl">🎁</span>
+            </div>
+            <h3 class="text-sm font-light text-gray-400 uppercase tracking-[0.2em] animate-pulse">Randomizing...</h3>
+            <div class="w-full overflow-hidden opacity-60">
+                <div class="w-full overflow-hidden flex">
+                    <div id="giftMarqueeRandom" class="marquee-track" style="animation-duration: 8s;"></div>
+                </div>
+            </div>
+        </div>
+
+        <div id="giftArea" class="hidden w-full transition-all duration-500 animate-pop">
+            <div class="bg-white/80 backdrop-blur-2xl p-6 rounded-[2.5rem] shadow-[0_8px_30px_rgb(0,0,0,0.04)] border border-white relative overflow-hidden text-center">
+                <p class="text-[10px] font-medium text-rose-400 tracking-widest uppercase mb-4">Congratulations</p>
+                <div id="giftImageContainer" class="w-full flex justify-center mb-4"></div>
+                <div id="giftNameDisplay" class="text-lg font-medium text-gray-800 break-words leading-tight px-4"></div>
+                
+                <div id="actionButtons" class="flex flex-col gap-3 w-full mt-8">
+                    <button onclick="acceptGift()" class="premium-btn">
+                        ถูกใจชิ้นนี้เลย
+                    </button>
+                    <div class="flex gap-3 w-full">
+                        <button onclick="rejectGift()" class="premium-btn-outline flex-1 text-sm py-3">
+                            สุ่มใหม่
+                        </button>
+                        <button onclick="showCustomInput()" class="premium-btn-outline flex-1 text-sm py-3 border-rose-200 text-rose-500 hover:bg-rose-50">
+                            ขอพิมพ์เอง
+                        </button>
+                    </div>
+                    <button onclick="showChooseScreen()" class="mt-4 text-gray-400 font-light py-2 text-xs tracking-wide hover:text-gray-600 transition-colors">
+                        ขอดูของขวัญทั้งหมด
+                    </button>
+                </div>
+            </div>
+        </div>
+        
+        <div id="customInputArea" class="hidden w-full flex flex-col items-center transition-all duration-500 bg-white/60 backdrop-blur-2xl p-8 rounded-[2.5rem] shadow-[0_8px_30px_rgb(0,0,0,0.04)] border border-white/80 relative z-10 animate-pop">
+            <h2 class="text-xl font-medium text-gray-800 mb-2 tracking-wide text-center">Make a Wish</h2>
+            <p class="text-gray-400 text-sm font-light mb-6 text-center">พิมพ์ของขวัญที่อยากได้ลงไปเลย</p>
+            <input type="text" id="customGiftInput" placeholder="เช่น กระเป๋าใบใหม่..." 
+                   class="w-full px-6 py-4 rounded-2xl border border-gray-100 bg-white/50 focus:bg-white focus:border-rose-200 focus:ring-4 focus:ring-rose-50 focus:outline-none text-center text-gray-700 text-base transition-all font-light shadow-inner mb-2">
+            <p id="customErrorMessage" class="text-rose-500 text-xs mt-1 mb-4 hidden font-medium text-center">พิมพ์ก่อนสิคนเก่ง!</p>
+            
+            <button onclick="submitCustomGift()" class="premium-btn mt-2">
+                ส่งคำขอ
+            </button>
+            <button onclick="startRandomizing()" class="mt-6 text-gray-400 font-light text-xs hover:text-gray-600">กลับไปสุ่มใหม่ดีกว่า</button>
+        </div>
+
+        <div id="chooseGiftScreen" class="hidden w-full flex flex-col items-center transition-all duration-500 bg-white/80 backdrop-blur-3xl p-6 rounded-[2.5rem] shadow-[0_8px_30px_rgb(0,0,0,0.04)] border border-white relative z-10 h-[85vh]">
+            <h2 class="text-lg font-medium text-gray-800 mb-1 mt-2 tracking-wide">Gift Catalog</h2>
+            <p class="text-gray-400 text-xs font-light mb-6">จิ้มเลือกชิ้นที่ถูกใจได้เลย</p>
+            <div id="chooseGiftGrid" class="w-full flex-1 overflow-y-auto grid grid-cols-2 gap-4 p-1 pb-4 scrollbar-hide"></div>
+            <div class="pt-4 border-t border-gray-100 w-full shrink-0">
+                <button onclick="startRandomizing()" class="premium-btn-outline">
+                    กลับไปหน้าสุ่ม
+                </button>
+            </div>
+        </div>
+
+        <div id="deliveryScreen" class="hidden w-full flex flex-col items-center justify-center transition-all duration-500 bg-white/60 backdrop-blur-2xl p-6 sm:p-8 rounded-[2.5rem] shadow-[0_8px_30px_rgb(0,0,0,0.04)] border border-white/80 relative overflow-hidden z-10 animate-pop">
+            <div class="z-10 text-center w-full">
+                <p class="text-[10px] font-medium text-rose-400 tracking-widest uppercase mb-3">Order Confirmed</p>
+                <h2 class="text-xl font-medium text-gray-800 mb-4 leading-tight">
+                    <span id="deliveryNameSpan" class="text-rose-500 font-semibold">ชื่อคนเก่ง</span><br>
+                    <span class="text-sm font-light text-gray-500 mt-1 block">ได้เลือกของขวัญเป็น...</span>
+                </h2>
+                
+                <div id="deliveryImageContainer" class="mt-4 flex justify-center"></div>
+                <div id="deliveryGiftName" class="text-base font-medium text-gray-800 break-words leading-tight mt-4 mb-4 px-4"></div>
+                
+                <div class="w-full flex justify-center overflow-hidden mb-5 relative py-2 scale-75 origin-center opacity-80 filter grayscale-[20%]">
+                    <div class="loader">
+                      <div class="truckWrapper">
+                        <div class="truckBody">
+                          <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 198 93" class="trucksvg">
+                            <path stroke-width="3" stroke="#282828" fill="#111827" d="M135 22.5H177.264C178.295 22.5 179.22 23.133 179.594 24.0939L192.33 56.8443C192.442 57.1332 192.5 57.4404 192.5 57.7504V89C192.5 90.3807 191.381 91.5 190 91.5H135C133.619 91.5 132.5 90.3807 132.5 89V25C132.5 23.6193 133.619 22.5 135 22.5Z"></path>
+                            <path stroke-width="3" stroke="#282828" fill="#f3f4f6" d="M146 33.5H181.741C182.779 33.5 183.709 34.1415 184.078 35.112L190.538 52.112C191.16 53.748 189.951 55.5 188.201 55.5H146C144.619 55.5 143.5 54.3807 143.5 53V36C143.5 34.6193 144.619 33.5 146 33.5Z"></path>
+                            <path stroke-width="2" stroke="#282828" fill="#282828" d="M150 65C150 65.39 149.763 65.8656 149.127 66.2893C148.499 66.7083 147.573 67 146.5 67C145.427 67 144.501 66.7083 143.873 66.2893C143.237 65.8656 143 65.39 143 65C143 64.61 143.237 64.1344 143.873 63.7107C144.501 63.2917 145.427 63 146.5 63C147.573 63 148.499 63.2917 149.127 63.7107C149.763 64.1344 150 64.61 150 65Z"></path>
+                            <rect stroke-width="2" stroke="#282828" fill="#fbcfe8" rx="1" height="7" width="5" y="63" x="187"></rect>
+                            <rect stroke-width="2" stroke="#282828" fill="#282828" rx="1" height="11" width="4" y="81" x="193"></rect>
+                            <rect stroke-width="3" stroke="#282828" fill="#ffffff" rx="2.5" height="90" width="121" y="1.5" x="6.5"></rect>
+                            <rect stroke-width="2" stroke="#282828" fill="#e5e7eb" rx="2" height="4" width="6" y="84" x="1"></rect>
+                          </svg>
+                        </div>
+                        <div class="truckTires">
+                          <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 30 30" class="tiresvg">
+                            <circle stroke-width="3" stroke="#282828" fill="#282828" r="13.5" cy="15" cx="15"></circle>
+                            <circle fill="#f3f4f6" r="7" cy="15" cx="15"></circle>
+                          </svg>
+                          <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 30 30" class="tiresvg">
+                            <circle stroke-width="3" stroke="#282828" fill="#282828" r="13.5" cy="15" cx="15"></circle>
+                            <circle fill="#f3f4f6" r="7" cy="15" cx="15"></circle>
+                          </svg>
+                        </div>
+                        <div class="road"></div>
+                      </div>
+                    </div>
+                </div>
+
+                <div class="flex gap-3 w-full mt-2">
+                    <button onclick="showHints()" class="premium-btn-outline flex-1 text-sm py-3 border-gray-200">
+                        หาของขวัญ
+                    </button>
+                    <button onclick="showChatScreen('review')" class="premium-btn-outline flex-1 text-sm py-3 border-gray-200">
+                        อ่านความในใจ
+                    </button>
+                </div>
+                
+                <div class="flex gap-3 w-full mt-3">
+                    <button onclick="startRandomizing()" class="premium-btn flex-1 text-sm py-3 bg-rose-500 hover:bg-rose-600 border-none shadow-md text-white">
+                        สุ่มของขวัญใหม่ 🎲
+                    </button>
+                </div>
+
+                <div class="flex justify-between w-full mt-6 px-4">
+                    <button onclick="goBackToMain()" class="text-gray-400 font-light text-xs hover:text-gray-600 transition-colors underline underline-offset-2">
+                        กลับหน้าหลัก
+                    </button>
+                    <button onclick="showThankYouScreen()" class="text-gray-400 font-light text-xs hover:text-rose-500 transition-colors underline underline-offset-2">
+                        ปิด ✖️
+                    </button>
+                </div>
+            </div>
+        </div>
+
+        <div id="hintScreen" class="hidden w-full flex flex-col items-center transition-all duration-500 bg-white/60 backdrop-blur-2xl p-8 rounded-[2.5rem] shadow-[0_8px_30px_rgb(0,0,0,0.04)] border border-white/80 relative z-10 animate-pop overflow-y-auto max-h-[85vh]">
+            <h2 class="text-xl font-medium text-gray-800 mb-6 tracking-wide text-center">Special Mission 2</h2>
+            
+            <div class="w-full space-y-4">
+                <div class="bg-white p-6 rounded-2xl border border-gray-100 shadow-[0_4px_20px_rgb(0,0,0,0.03)] border-l-4 border-l-gray-800">
+                    <h3 class="font-medium text-gray-800 text-sm mb-2 uppercase tracking-widest">Hint: Gift 🎁</h3>
+                    <p class="text-gray-500 text-sm font-light leading-relaxed">
+                        ลองไปที่เตียงนอน แล้วยกหมอนใบโปรดขึ้นมาดูสิ มีอะไรซุกซ่อนอยู่รึเปล่าน๊าา? รีบไปดูเร๊ววว!
+                    </p>
+                </div>
+            </div>
+            
+            <div class="w-full mt-8">
+                <button onclick="backToDeliveryFromHint()" class="premium-btn">
+                    กลับไปดูสถานะจัดส่ง
+                </button>
+            </div>
+        </div>
+
+        <div id="thankYouScreen" class="hidden w-full flex flex-col items-center justify-center transition-all duration-500 bg-white/60 backdrop-blur-2xl py-12 px-8 rounded-[2.5rem] shadow-[0_8px_30px_rgb(0,0,0,0.04)] border border-white/80 relative overflow-hidden z-10 animate-pop text-center">
+            
+            <div class="w-full max-w-[200px] sm:max-w-[240px] mb-8 p-2.5 bg-white rounded-2xl shadow-[0_8px_30px_rgb(0,0,0,0.08)] border border-rose-50 mx-auto transform -rotate-2">
+                <img src="https://img1.pic.in.th/images/uri_mr1651160194744.jpg" alt="อิน" class="w-full h-auto object-cover rounded-xl">
+            </div>
+
+            <h2 class="text-xl sm:text-2xl font-medium text-gray-800 mb-4 leading-relaxed tracking-wide">
+                ขอบคุณที่คอยอยู่เคียงข้างกัน<br>มาตลอดที่ผ่านมาน่ะ ✨
+            </h2>
+            <p class="text-sm font-light text-gray-500 mt-2 mb-8">
+                จากอินคนเงียบๆ ของเตง 😊
+            </p>
+            
+            <div class="w-full mt-4">
+                <button onclick="resetGame()" class="premium-btn-outline border-gray-200 text-sm py-3 text-gray-500 hover:text-gray-800">
+                    ปิด ✖️
+                </button>
+            </div>
+        </div>
+
+    </main>
+
+    <div class="pb-2 pt-1 shrink-0 bg-transparent">
+        <div class="h-1.5 w-1/3 bg-gray-200 mx-auto rounded-full"></div>
+    </div>
+    
+    <style>
+        .scrollbar-hide::-webkit-scrollbar { display: none; }
+        .scrollbar-hide { -ms-overflow-style: none; scrollbar-width: none; }
+    </style>
+</body>
+</html>
